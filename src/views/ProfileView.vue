@@ -10,6 +10,18 @@ const confirmPassword = ref('')
 const avatarSrc = ref('https://lh3.googleusercontent.com/aida-public/AB6AXuBnu_GA6LZh4FF0k72IT3HRgauHyRuNSqW5SV5JWaIr9pNtKsphDiaxvz7LVZRdDAipd2V4c0h7HxHARONzE4Ga5YDv02MQl10ZSMC3HM2GIw-VELaMVXdAfnoPwaiVfVS6B7rwzfQ7Ht0PwBTocC1k1JeMqrhk-QgLRbPafH-tSYQrTiNNNr5CvSucEx1m8kzMXjeCBQnxBzjc3L3urkD8vZZQExw7MdbKZdNCZ94GLj1rfr_MhIzW7aYFsKfmjrtRM2Yb1g76Cu7v')
 const fileInput = ref<HTMLInputElement | null>(null)
 
+const activityLog = ref([
+  { id: 1, action: 'เข้าสู่ระบบ', time: '10:30 น.', date: '24 ต.ค. 2024' },
+  { id: 2, action: 'เปลี่ยนรหัสผ่าน', time: '09:15 น.', date: '22 ต.ค. 2024' },
+])
+
+const addLog = (action: string) => {
+  const now = new Date()
+  const time = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')} น.`
+  const date = 'วันนี้'
+  activityLog.value.unshift({ id: Date.now(), action, time, date })
+}
+
 const triggerFileInput = () => {
   fileInput.value?.click()
 }
@@ -22,6 +34,7 @@ const handleFileUpload = (event: Event) => {
     reader.onload = (e) => {
       if (e.target?.result) {
         avatarSrc.value = e.target.result as string
+        addLog('เปลี่ยนรูปโปรไฟล์')
       }
     }
     reader.readAsDataURL(file)
@@ -29,6 +42,7 @@ const handleFileUpload = (event: Event) => {
 }
 
 const handleSave = () => {
+  addLog('อัปเดตข้อมูลโปรไฟล์')
   alert('บันทึกการเปลี่ยนแปลงเรียบร้อยแล้ว')
 }
 </script>
@@ -212,6 +226,33 @@ const handleSave = () => {
             </div>
           </div>
         </section>
+        <!-- Activity Log Section -->
+        <section class="w-full max-w-xl bg-white rounded-3xl p-8 border border-surface-container-high shadow-lg mt-8 mb-8">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-secondary-container flex items-center justify-center text-secondary">
+              <LayoutDashboard :size="20" />
+            </div>
+            <h2 class="text-xl font-bold text-on-surface">ประวัติการใช้งาน</h2>
+          </div>
+          
+          <div class="space-y-4">
+            <div 
+              v-for="log in activityLog" 
+              :key="log.id" 
+              class="flex items-center justify-between p-4 rounded-2xl bg-surface-container-low/50 border border-transparent hover:border-surface-container-high transition-all"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-2 h-2 rounded-full bg-primary"></div>
+                <p class="text-sm font-medium text-on-surface">{{ log.action }}</p>
+              </div>
+              <div class="text-right text-xs text-on-surface-variant">
+                <p class="font-semibold">{{ log.time }}</p>
+                <p class="opacity-70">{{ log.date }}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </main>
 
       <footer class="py-10 border-t border-surface-container-high bg-white">

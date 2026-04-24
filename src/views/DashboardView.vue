@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import { Users, Bolt, TrendingUp, MonitorCheck, Menu, User, LayoutDashboard, BarChart3, Settings, Search } from 'lucide-vue-next'
+import { Users, Bolt, TrendingUp, MonitorCheck, Menu, User, LayoutDashboard, BarChart3, Settings, Search, Trash2, Plus, X } from 'lucide-vue-next'
 import { ref, computed } from 'vue'
 
 const isSidebarOpen = ref(false)
 const searchQuery = ref('')
+const isAddModalOpen = ref(false)
+
+const newMember = ref({
+  name: '',
+  email: '',
+  role: 'Viewer',
+  department: '',
+  avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+})
 
 const team = ref([
   {
@@ -45,6 +54,29 @@ const filteredTeam = computed(() => {
     member.department.toLowerCase().includes(query)
   )
 })
+
+const addMember = () => {
+  if (newMember.value.name && newMember.value.email) {
+    team.value.push({
+      ...newMember.value,
+      lastActive: 'เพิ่งเริ่มใช้งาน'
+    })
+    isAddModalOpen.value = false
+    newMember.value = {
+      name: '',
+      email: '',
+      role: 'Viewer',
+      department: '',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    }
+  }
+}
+
+const removeMember = (email: string) => {
+  if (confirm('คุณแน่ใจว่าต้องการลบสมาชิกคนนี้ออกจากทีม?')) {
+    team.value = team.value.filter(m => m.email !== email)
+  }
+}
 </script>
 
 <template>
@@ -173,7 +205,13 @@ const filteredTeam = computed(() => {
                 placeholder="ค้นหาชื่อ, อีเมล, บทบาท..."
               />
             </div>
-            <button class="bg-surface-container-low text-primary text-sm font-medium px-4 py-2 rounded-full hover:bg-surface-container-high transition-colors whitespace-nowrap">ดูทั้งหมด</button>
+            <button 
+              @click="isAddModalOpen = true"
+              class="bg-primary text-on-primary text-sm font-medium px-4 py-2 rounded-full hover:bg-primary-container transition-all flex items-center gap-2 shadow-sm active:scale-95"
+            >
+              <Plus :size="16" />
+              เพิ่มสมาชิก
+            </button>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left">
@@ -182,7 +220,7 @@ const filteredTeam = computed(() => {
                   <th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">ชื่อ</th>
                   <th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">บทบาท</th>
                   <th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">แผนก</th>
-                  <th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">ใช้งานล่าสุด</th>
+                  <th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider text-right">จัดการ</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-surface-container-high">
@@ -206,14 +244,89 @@ const filteredTeam = computed(() => {
                       </option>
                     </select>
                   </td>
-                  <td class="px-6 py-4 text-sm text-on-surface-variant">{{ member.department }}</td>
-                  <td class="px-6 py-4 text-xs text-on-surface-variant">{{ member.lastActive }}</td>
+                  <td class="px-6 py-4 text-sm text-on-surface-variant">
+                    <p>{{ member.department }}</p>
+                    <p class="text-[10px] opacity-60">{{ member.lastActive }}</p>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <button 
+                      @click="removeMember(member.email)"
+                      class="p-2 text-on-surface-variant hover:text-error hover:bg-error-container/20 rounded-lg transition-all active:scale-90"
+                    >
+                      <Trash2 :size="18" />
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </section>
       </main>
+
+      <!-- Add Member Modal -->
+      <div v-if="isAddModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="isAddModalOpen = false"></div>
+        <div class="relative bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl border border-surface-container-high">
+          <div class="flex justify-between items-start mb-6">
+            <div>
+              <h3 class="text-xl font-bold text-on-surface">เพิ่มสมาชิกใหม่</h3>
+              <p class="text-sm text-on-surface-variant">เชิญคนเข้าร่วมทีม NexusApp</p>
+            </div>
+            <button @click="isAddModalOpen = false" class="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+              <X :size="20" />
+            </button>
+          </div>
+          
+          <form @submit.prevent="addMember" class="space-y-4">
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-on-surface-variant uppercase px-1">ชื่อสมาชิค</label>
+              <input 
+                v-model="newMember.name"
+                class="w-full bg-surface-container-low border border-transparent rounded-2xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all outline-none" 
+                placeholder="ระบุชื่อ-นามสกุล" 
+                required
+              />
+            </div>
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-on-surface-variant uppercase px-1">อีเมล</label>
+              <input 
+                v-model="newMember.email"
+                type="email"
+                class="w-full bg-surface-container-low border border-transparent rounded-2xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all outline-none" 
+                placeholder="member@company.com" 
+                required
+              />
+            </div>
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-on-surface-variant uppercase px-1">แผนก</label>
+              <input 
+                v-model="newMember.department"
+                class="w-full bg-surface-container-low border border-transparent rounded-2xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all outline-none" 
+                placeholder="เช่น การตลาด, วิศวกรรม" 
+                required
+              />
+            </div>
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-on-surface-variant uppercase px-1">บทบาท</label>
+              <select 
+                v-model="newMember.role"
+                class="w-full bg-surface-container-low border border-transparent rounded-2xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all outline-none cursor-pointer"
+              >
+                <option v-for="role in availableRoles" :key="role" :value="role">{{ role }}</option>
+              </select>
+            </div>
+            
+            <div class="pt-4">
+              <button 
+                type="submit"
+                class="w-full bg-primary text-on-primary font-bold py-4 rounded-full hover:bg-primary/90 transition-all active:scale-[0.98] shadow-md shadow-primary/20"
+              >
+                เพิ่มเข้าทีม
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
 
       <footer class="mt-auto border-t border-surface-container-high py-8">
         <div class="px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-on-surface-variant">

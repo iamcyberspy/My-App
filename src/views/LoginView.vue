@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Loader2 } from 'lucide-vue-next'
 
 const router = useRouter()
 const email = ref('')
 const password = ref('')
+const isLoading = ref(false)
 
-const handleLogin = () => {
-  // Simulate login
+const handleLogin = async () => {
+  isLoading.value = true
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 1500))
+  isLoading.value = false
   router.push('/dashboard')
 }
 </script>
@@ -51,10 +56,12 @@ const handleLogin = () => {
           
           <div class="pt-2">
             <button 
-              class="w-full h-14 bg-primary text-on-primary font-medium rounded-full hover:bg-opacity-90 hover:shadow-lg active:scale-[0.97] transition-all flex items-center justify-center shadow-md shadow-primary/20" 
+              class="w-full h-14 bg-primary text-on-primary font-medium rounded-full hover:bg-opacity-90 hover:shadow-lg active:scale-[0.97] transition-all flex items-center justify-center shadow-md shadow-primary/20 disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100" 
               type="submit"
+              :disabled="isLoading"
             >
-              เข้าสู่ระบบ
+              <Loader2 v-if="isLoading" class="animate-spin mr-2" :size="20" />
+              <span v-else>เข้าสู่ระบบ</span>
             </button>
           </div>
         </form>
