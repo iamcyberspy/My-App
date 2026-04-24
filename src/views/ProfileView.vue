@@ -3,12 +3,15 @@ import { ref } from 'vue'
 import { Camera, Edit3, Save, Shield, Bell, Menu, User, LayoutDashboard, BarChart3, Settings, Users } from 'lucide-vue-next'
 
 const isSidebarOpen = ref(false)
-const name = ref('Alex Thompson')
+const name = ref('อะเล็กซ์ ทอมป์สัน')
 const email = ref('alex.thompson@nexus.app')
+const bio = ref('Product Designer ที่หลงใหลในการสร้างประสบการณ์ใช้งานที่ยอดเยี่ยม')
 const newPassword = ref('')
 const confirmPassword = ref('')
 const avatarSrc = ref('https://lh3.googleusercontent.com/aida-public/AB6AXuBnu_GA6LZh4FF0k72IT3HRgauHyRuNSqW5SV5JWaIr9pNtKsphDiaxvz7LVZRdDAipd2V4c0h7HxHARONzE4Ga5YDv02MQl10ZSMC3HM2GIw-VELaMVXdAfnoPwaiVfVS6B7rwzfQ7Ht0PwBTocC1k1JeMqrhk-QgLRbPafH-tSYQrTiNNNr5CvSucEx1m8kzMXjeCBQnxBzjc3L3urkD8vZZQExw7MdbKZdNCZ94GLj1rfr_MhIzW7aYFsKfmjrtRM2Yb1g76Cu7v')
+const headerSrc = ref('https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')
 const fileInput = ref<HTMLInputElement | null>(null)
+const headerInput = ref<HTMLInputElement | null>(null)
 
 const activityLog = ref([
   { id: 1, action: 'เข้าสู่ระบบ', time: '10:30 น.', date: '24 ต.ค. 2024' },
@@ -26,6 +29,10 @@ const triggerFileInput = () => {
   fileInput.value?.click()
 }
 
+const triggerHeaderInput = () => {
+  headerInput.value?.click()
+}
+
 const handleFileUpload = (event: Event) => {
   const target = event.target as HTMLInputElement
   if (target.files && target.files[0]) {
@@ -35,6 +42,21 @@ const handleFileUpload = (event: Event) => {
       if (e.target?.result) {
         avatarSrc.value = e.target.result as string
         addLog('เปลี่ยนรูปโปรไฟล์')
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+const handleHeaderUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    const file = target.files[0]
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        headerSrc.value = e.target.result as string
+        addLog('เปลี่ยนรูปหน้าปก')
       }
     }
     reader.readAsDataURL(file)
@@ -113,28 +135,56 @@ const handleSave = () => {
       </header>
 
       <main class="flex-grow py-12 px-6 flex flex-col items-center">
-        <!-- Profile Header -->
-        <section class="text-center mb-12">
-          <div class="relative inline-block">
+        <!-- Profile Header With Cover -->
+        <section class="w-full max-w-4xl mb-12 relative">
+          <div class="h-48 md:h-64 rounded-3xl overflow-hidden relative bg-surface-container-low border border-surface-container-high group">
+            <img :src="headerSrc" alt="Cover" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <button 
+                @click="triggerHeaderInput"
+                class="bg-white/90 text-on-surface px-4 py-2 rounded-full font-medium flex items-center gap-2 shadow-xl hover:bg-white active:scale-95 transition-all"
+              >
+                <Camera :size="18" />
+                <span>เปลี่ยนรูปปก</span>
+              </button>
+            </div>
             <input 
               type="file" 
-              ref="fileInput" 
+              ref="headerInput" 
               class="hidden" 
               accept="image/*" 
-              @change="handleFileUpload"
+              @change="handleHeaderUpload"
             />
-            <div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl overflow-hidden mb-6 bg-surface-container-low">
-              <img :src="avatarSrc" alt="Profile" class="w-full h-full object-cover">
-            </div>
-            <button 
-              @click="triggerFileInput"
-              class="absolute bottom-6 right-2 bg-primary text-on-primary p-2.5 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 border-2 border-white"
-            >
-              <Camera :size="16" />
-            </button>
           </div>
-          <h1 class="text-3xl font-bold text-on-surface mb-2">{{ name }}</h1>
-          <p class="text-on-surface-variant italic">{{ email }}</p>
+
+          <div class="flex flex-col items-center -mt-16 md:-mt-20 relative px-6">
+            <div class="relative">
+              <div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-surface-container-low group">
+                <img :src="avatarSrc" alt="Profile" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                <div @click="triggerFileInput" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                  <Camera :size="24" class="text-white" />
+                </div>
+              </div>
+              <button 
+                @click="triggerFileInput"
+                class="absolute bottom-2 right-2 bg-primary text-on-primary p-2.5 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 border-2 border-white"
+              >
+                <Camera :size="16" />
+              </button>
+              <input 
+                type="file" 
+                ref="fileInput" 
+                class="hidden" 
+                accept="image/*" 
+                @change="handleFileUpload"
+              />
+            </div>
+            <div class="mt-4 text-center">
+              <h1 class="text-3xl font-bold text-on-surface mb-2">{{ name }}</h1>
+              <p class="text-on-surface-variant max-w-md mx-auto line-clamp-2">{{ bio }}</p>
+              <p class="text-xs text-on-surface-variant font-medium mt-2 opacity-60 uppercase tracking-widest">{{ email }}</p>
+            </div>
+          </div>
         </section>
 
         <!-- Edit Form -->
@@ -155,6 +205,17 @@ const handleSave = () => {
                 id="name" 
                 type="text"
               />
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-on-surface block px-1" for="bio">คำอธิบายตัวเอง (Bio)</label>
+              <textarea 
+                v-model="bio"
+                rows="3"
+                class="w-full bg-surface-container-low border border-transparent rounded-2xl px-4 py-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary text-base transition-all outline-none resize-none" 
+                id="bio"
+                placeholder="บอกเล่าเรื่องราวสั้นๆ เกี่ยวกับตัวคุณ..."
+              ></textarea>
             </div>
 
             <div class="space-y-2">
