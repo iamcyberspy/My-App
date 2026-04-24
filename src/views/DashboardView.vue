@@ -5,11 +5,11 @@ import { ref, computed } from 'vue'
 const isSidebarOpen = ref(false)
 const searchQuery = ref('')
 
-const team = [
+const team = ref([
   {
     name: 'Sarah Jensen',
     email: 'sarah.j@nexusapp.io',
-    role: 'หัวหน้าทีมอาวุโส',
+    role: 'Admin',
     department: 'ออกแบบผลิตภัณฑ์',
     lastActive: '2 นาทีที่แล้ว',
     avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD2vU8yoA6FkP-1BBWjuHVme6r-2Kwsa7cSslhADWYJZuWDo4dUAYADybWQ3bRnCVVLQuj9RxO45CuChPfFLa7V3LYq_8ufwT3NU5an7_EEJXEiWhPdclesUNjkCj_t6wuiaayVmF38T1V0xcFq-Fsikbn8VBC6DKQUCgjSW8JGReGpqAFTvFmUc3lVegA3dCrObxIiQi982Tahdi1ztNMG7EnUEyPW8qPVTXl9MIV6lK-wnXkUcOFWewpoRbn0Tliym3VRysDEmWo-'
@@ -17,7 +17,7 @@ const team = [
   {
     name: 'Michael Chen',
     email: 'm.chen@nexusapp.io',
-    role: 'สถาปนิก',
+    role: 'Editor',
     department: 'วิศวกรรม',
     lastActive: '1 ชั่วโมงที่แล้ว',
     avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuABW6P02uXBgCdpcEqB1iYhokSlKUpiPpk3TnCGUeecwAx8PdKF-nDPkOW41HFrdFqlUTqkYNBpx2g6vbU_cfnMUrlJR1eYuUXeXmuQxa0qpwMY_f8em3dJKsZVZzw3PkO7wAOsdkDwXYc4O4O-SRSO8mCJ84z4iMiVjg0j6ZUQY44GxPMVlWsg_vEpV0Vx6lrVvw0B148fioqDa41prcsFbAODTspjxZtPwgwIbdwRONn-2RcrGrUOyHhSGO5LCmUUPKtmkFQLPKYe'
@@ -25,18 +25,20 @@ const team = [
   {
     name: 'Elena Rodriguez',
     email: 'elena.r@nexusapp.io',
-    role: 'นักวิเคราะห์',
+    role: 'Viewer',
     department: 'การตลาด',
     lastActive: 'เมื่อวานนี้',
     avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAsk1HGnRYnC4jgFt4fwYOMwkZsG86ZJGbuJGIc_ao0oeNEMt0gkq7x9pPgM4RMlcmL_DUzaRk6YawpwE6vcL6lEFzR6un0LmOxlEop31CuC46F2HqtGQRpK4FdcMj7X1ly2qGuIZ7qSzIicB4dWhRkHiE-IRIWFINb0plCRp_5XpCKFbM1uozgu7QLpb6LamIuMbmH31D36yyuYtXnD3JlcFeqq7GYNk3w52JcR8di3YhJYZmMFOsSbfvMU2dxV7MOap1pK-3nGjA3'
   }
-]
+])
+
+const availableRoles = ['Admin', 'Editor', 'Viewer']
 
 const filteredTeam = computed(() => {
   const query = searchQuery.value.toLowerCase().trim()
-  if (!query) return team
+  if (!query) return team.value
   
-  return team.filter(member => 
+  return team.value.filter(member => 
     member.name.toLowerCase().includes(query) ||
     member.email.toLowerCase().includes(query) ||
     member.role.toLowerCase().includes(query) ||
@@ -194,7 +196,16 @@ const filteredTeam = computed(() => {
                       <p class="text-xs text-on-surface-variant">{{ member.email }}</p>
                     </div>
                   </td>
-                  <td class="px-6 py-4 text-sm text-on-surface-variant">{{ member.role }}</td>
+                  <td class="px-6 py-4 text-sm">
+                    <select 
+                      v-model="member.role" 
+                      class="bg-surface-container-low border border-surface-container-high rounded-full px-3 py-1 text-xs font-semibold text-on-surface-variant focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none cursor-pointer hover:bg-white transition-all"
+                    >
+                      <option v-for="role in availableRoles" :key="role" :value="role">
+                        {{ role }}
+                      </option>
+                    </select>
+                  </td>
                   <td class="px-6 py-4 text-sm text-on-surface-variant">{{ member.department }}</td>
                   <td class="px-6 py-4 text-xs text-on-surface-variant">{{ member.lastActive }}</td>
                 </tr>
