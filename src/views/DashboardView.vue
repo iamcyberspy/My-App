@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Users, Bolt, TrendingUp, MonitorCheck, Menu, User, LayoutDashboard, BarChart3, Settings } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { Users, Bolt, TrendingUp, MonitorCheck, Menu, User, LayoutDashboard, BarChart3, Settings, Search } from 'lucide-vue-next'
+import { ref, computed } from 'vue'
 
 const isSidebarOpen = ref(false)
+const searchQuery = ref('')
 
 const team = [
   {
@@ -30,6 +31,18 @@ const team = [
     avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAsk1HGnRYnC4jgFt4fwYOMwkZsG86ZJGbuJGIc_ao0oeNEMt0gkq7x9pPgM4RMlcmL_DUzaRk6YawpwE6vcL6lEFzR6un0LmOxlEop31CuC46F2HqtGQRpK4FdcMj7X1ly2qGuIZ7qSzIicB4dWhRkHiE-IRIWFINb0plCRp_5XpCKFbM1uozgu7QLpb6LamIuMbmH31D36yyuYtXnD3JlcFeqq7GYNk3w52JcR8di3YhJYZmMFOsSbfvMU2dxV7MOap1pK-3nGjA3'
   }
 ]
+
+const filteredTeam = computed(() => {
+  const query = searchQuery.value.toLowerCase().trim()
+  if (!query) return team
+  
+  return team.filter(member => 
+    member.name.toLowerCase().includes(query) ||
+    member.email.toLowerCase().includes(query) ||
+    member.role.toLowerCase().includes(query) ||
+    member.department.toLowerCase().includes(query)
+  )
+})
 </script>
 
 <template>
@@ -145,9 +158,20 @@ const team = [
         </section>
 
         <section class="bg-white rounded-xl border border-surface-container-high shadow-sm overflow-hidden">
-          <div class="px-6 py-4 border-b border-surface-container-high flex justify-between items-center bg-surface-container-lowest">
-            <h3 class="text-lg font-bold text-on-surface">รายชื่อทีม</h3>
-            <button class="bg-surface-container-low text-primary text-sm font-medium px-4 py-2 rounded-full hover:bg-surface-container-high transition-colors">ดูทั้งหมด</button>
+          <div class="px-6 py-4 border-b border-surface-container-high flex flex-col md:flex-row justify-between items-center bg-surface-container-lowest gap-4">
+            <h3 class="text-lg font-bold text-on-surface whitespace-nowrap">รายชื่อทีม</h3>
+            <div class="relative w-full max-w-md">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search class="h-4 w-4 text-on-surface-variant" />
+              </div>
+              <input 
+                v-model="searchQuery"
+                type="text" 
+                class="block w-full pl-10 pr-3 py-2 border border-surface-container-high rounded-full bg-surface-container-low focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all outline-none" 
+                placeholder="ค้นหาชื่อ, อีเมล, บทบาท..."
+              />
+            </div>
+            <button class="bg-surface-container-low text-primary text-sm font-medium px-4 py-2 rounded-full hover:bg-surface-container-high transition-colors whitespace-nowrap">ดูทั้งหมด</button>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left">
@@ -160,7 +184,7 @@ const team = [
                 </tr>
               </thead>
               <tbody class="divide-y divide-surface-container-high">
-                <tr v-for="member in team" :key="member.email" class="hover:bg-primary/5 transition-colors group">
+                <tr v-for="member in filteredTeam" :key="member.email" class="hover:bg-primary/5 transition-colors group">
                   <td class="px-6 py-4 flex items-center gap-4">
                     <div class="w-10 h-10 rounded-full bg-surface-container-low overflow-hidden shadow-sm">
                       <img :src="member.avatar" :alt="member.name" class="w-full h-full object-cover">
