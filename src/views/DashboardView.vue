@@ -117,10 +117,10 @@ const removeMember = (email: string) => {
           <User :size="20" />
           <span>โปรไฟล์</span>
         </router-link>
-        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors">
+        <router-link to="/settings" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors">
           <Settings :size="20" />
           <span>การตั้งค่า</span>
-        </a >
+        </router-link>
       </nav>
       
       <div class="p-6 border-t border-surface-container-high">
