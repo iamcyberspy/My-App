@@ -7,6 +7,26 @@ const name = ref('Alex Thompson')
 const email = ref('alex.thompson@nexus.app')
 const newPassword = ref('')
 const confirmPassword = ref('')
+const avatarSrc = ref('https://lh3.googleusercontent.com/aida-public/AB6AXuBnu_GA6LZh4FF0k72IT3HRgauHyRuNSqW5SV5JWaIr9pNtKsphDiaxvz7LVZRdDAipd2V4c0h7HxHARONzE4Ga5YDv02MQl10ZSMC3HM2GIw-VELaMVXdAfnoPwaiVfVS6B7rwzfQ7Ht0PwBTocC1k1JeMqrhk-QgLRbPafH-tSYQrTiNNNr5CvSucEx1m8kzMXjeCBQnxBzjc3L3urkD8vZZQExw7MdbKZdNCZ94GLj1rfr_MhIzW7aYFsKfmjrtRM2Yb1g76Cu7v')
+const fileInput = ref<HTMLInputElement | null>(null)
+
+const triggerFileInput = () => {
+  fileInput.value?.click()
+}
+
+const handleFileUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    const file = target.files[0]
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        avatarSrc.value = e.target.result as string
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+}
 
 const handleSave = () => {
   alert('บันทึกการเปลี่ยนแปลงเรียบร้อยแล้ว')
@@ -60,7 +80,7 @@ const handleSave = () => {
       <div class="p-6 border-t border-surface-container-high">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-full bg-surface-container-low overflow-hidden border border-surface-container-high">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwE98zYNmOVaAHFMw-ggFuuJBWHZ9Plv2SYkQV9znOAsDzdPCS4NWxS26ShfstknjKxuWAQC2lir1i9hqwp5cyY4Z9_xi9ksuNI7mUfiCLyeo7GGMX_YDIND7YSZqS3iI_HTXWHKF5vt-xWCUpJQW_E9dT6is2mzf41F-wpBbwKb-tWhqPRVotoV9u78pZNsQCyZ3j5f8yGZeJut0WmMkbubgl62lxF4OUlQUJJ0r7vJ_dgFBL47wzS7DpzXumOkyw2VFLfAFnLXSl" alt="Profile" class="w-full h-full object-cover" />
+            <img :src="avatarSrc" alt="Profile" class="w-full h-full object-cover" />
           </div>
           <div>
             <p class="text-sm font-semibold text-on-surface">Alex Thompson</p>
@@ -82,10 +102,20 @@ const handleSave = () => {
         <!-- Profile Header -->
         <section class="text-center mb-12">
           <div class="relative inline-block">
+            <input 
+              type="file" 
+              ref="fileInput" 
+              class="hidden" 
+              accept="image/*" 
+              @change="handleFileUpload"
+            />
             <div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl overflow-hidden mb-6 bg-surface-container-low">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnu_GA6LZh4FF0k72IT3HRgauHyRuNSqW5SV5JWaIr9pNtKsphDiaxvz7LVZRdDAipd2V4c0h7HxHARONzE4Ga5YDv02MQl10ZSMC3HM2GIw-VELaMVXdAfnoPwaiVfVS6B7rwzfQ7Ht0PwBTocC1k1JeMqrhk-QgLRbPafH-tSYQrTiNNNr5CvSucEx1m8kzMXjeCBQnxBzjc3L3urkD8vZZQExw7MdbKZdNCZ94GLj1rfr_MhIzW7aYFsKfmjrtRM2Yb1g76Cu7v" alt="Profile" class="w-full h-full object-cover">
+              <img :src="avatarSrc" alt="Profile" class="w-full h-full object-cover">
             </div>
-            <button class="absolute bottom-6 right-2 bg-primary text-on-primary p-2.5 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 border-2 border-white">
+            <button 
+              @click="triggerFileInput"
+              class="absolute bottom-6 right-2 bg-primary text-on-primary p-2.5 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 border-2 border-white"
+            >
               <Camera :size="16" />
             </button>
           </div>
