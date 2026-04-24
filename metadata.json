@@ -1,0 +1,6 @@
+{
+  "name": "NexusApp",
+  "description": "A modern minimal dashboard and management application built with Vue.js.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
